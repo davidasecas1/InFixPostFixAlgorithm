@@ -1,5 +1,5 @@
 /**
- * @author David Espejo Antiñolo
+ * @author David Espejo AntiÃ±olo
  */
 package main;
 
@@ -12,12 +12,13 @@ public class Main {
 	public static void main(String[] args){
 		Scanner s=new Scanner(System.in); //I declare the Scanner to take the input from the user
 		Fix f=new Fix(s.nextLine()); //I create a Fix object in which is the algorithm
+		s.close();
 		double TInicio, TFin, tiempo; //I declare time variables
 		TInicio = System.nanoTime(); //I store the current CPU time in the init time variable in nanoseconds
 		System.out.println(f.toResult(f.toPostFix()));//I execute the algorithm, giving as argument the infix to postfix result
 		TFin = System.nanoTime();//I store the current CPU time in the final time variable
 		tiempo = TFin - TInicio; //I calculate the difference between the final time and the init one, so i get the total execution time of the algorithm
-		System.out.println("Tiempo de ejecución en milisegundos: " + tiempo/1000000);//I print the time value in milliseconds with decimals
+		System.out.println("Tiempo de ejecuciÃ³n en milisegundos: " + tiempo/1000000);//I print the time value in milliseconds with decimals
 	}
 
 }
@@ -43,7 +44,7 @@ class Fix{
 		Stack<Character> operators=new Stack<Character>();
 		for(int i=0;i<input.length();i++){
 			char elm=input.charAt(i);
-			if(checkOp(elm)){
+			if(checkOp(elm) && elm!=0){
 				if(!operators.empty()){
 					int p=priority((char)operators.peek(),elm);
 					if(p==2){
@@ -118,7 +119,12 @@ class Fix{
 			System.out.print(elm);
 			if(checkOp(elm)){
 				float num1=nums.pop();
-				float num2=nums.pop();
+				float num2;
+				if(!nums.empty()) { //Negative numbers
+					num2=nums.pop();
+				}else {
+					num2=0;
+				}
 				float resOp=0;
 				switch(elm){
 					case "+":
@@ -132,6 +138,9 @@ class Fix{
 						break;
 					case "/":
 						resOp=num2/num1;
+						break;
+					case "^":
+						resOp=(float) Math.pow(num2, num1);
 						break;
 				}
 				nums.push(resOp);
@@ -149,7 +158,7 @@ class Fix{
 	 * @return true if elm is an operator or a bracket and false if it isn't
 	 */
 	public boolean checkOp(char elm){
-		return (elm=='+' || elm=='-' || elm=='*' || elm=='/' || elm=='(' || elm==')');
+		return (elm=='+' || elm=='-' || elm=='*' || elm=='/' || elm=='(' || elm==')' || elm=='^');
 	}
 	/**
 	 * Returns true if elm is an operator or a bracket
@@ -157,16 +166,25 @@ class Fix{
 	 * @return true if elm is an operator or a bracket and false if it isn't
 	 */
 	public boolean checkOp(String elm){
-		return (elm.equals("+") || elm.equals("-") || elm.equals("*") || elm.equals("/") || elm.equals("(") || elm.equals(")"));
+		return (elm.equals("+") || elm.equals("-") || elm.equals("*") || elm.equals("/") || elm.equals("(") || elm.equals(")") || elm.equals("^"));
 	}
 	/**
 	 * Returns the level of the priority between operators, it compares op1 and op2 characters.
 	 * @param op1 First operation you want to compare.
 	 * @param op2 Second operation you want to compare.
-	 * @return the level of priority. The higher number, the higher the priority
+	 * @return the level of priority. The higher number, the higher the priority CAMBIAR
 	 */
 	public int priority(char op1,char op2){
 		int res=-1;
+		if((op1=='+' || op1=='-' || op1=='*' || op1=='/') && op2=='^'){
+			res=2;
+		}
+		if(op1=='^' &&(op2=='+' || op2=='-' || op2=='*' || op2=='/') ){
+			res=1;
+		}
+		if(op1=='^' && op2=='^'){
+			res=0;
+		}
 		if((op1=='+' || op1=='-')&&(op2=='*' || op2=='/')){
 			res=2;
 		}
@@ -200,5 +218,3 @@ class Fix{
 		return res;
 	}
 }
-
-
